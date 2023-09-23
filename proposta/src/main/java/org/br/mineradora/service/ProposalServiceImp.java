@@ -1,5 +1,6 @@
 package org.br.mineradora.service;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.br.mineradora.dto.ProposalDTO;
@@ -10,6 +11,7 @@ import org.br.mineradora.repository.ProposalRepository;
 
 import java.util.Date;
 
+@ApplicationScoped
 public class ProposalServiceImp implements ProposalService{
 
     @Inject
@@ -39,8 +41,14 @@ public class ProposalServiceImp implements ProposalService{
         kafkaMessages.sendNewKafkaEvent(proposal);
     }
 
+    @Override
     @Transactional
-    private ProposalDTO buildAndSaveNewProposal(ProposalDetailsDTO proposalDetailsDTO) {
+    public void removeProposal(Long id) {
+        proposalRepository.deleteById(id);
+    }
+
+    @Transactional
+    public ProposalDTO buildAndSaveNewProposal(ProposalDetailsDTO proposalDetailsDTO) {
         try {
 
             ProposalEntity proposal = new ProposalEntity();
@@ -65,11 +73,5 @@ public class ProposalServiceImp implements ProposalService{
             throw new RuntimeException();
         }
 
-    }
-
-    @Override
-    @Transactional
-    public void removeProposal(Long id) {
-        proposalRepository.deleteById(id);
     }
 }
